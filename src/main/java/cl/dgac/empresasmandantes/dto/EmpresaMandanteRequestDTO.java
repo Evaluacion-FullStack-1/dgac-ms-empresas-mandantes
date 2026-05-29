@@ -2,10 +2,7 @@ package cl.dgac.empresasmandantes.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.time.LocalDate;
 
 @Data
 public class EmpresaMandanteRequestDTO {
@@ -30,7 +27,4 @@ public class EmpresaMandanteRequestDTO {
 
     @NotBlank(message = "El estado es obligatorio")
     private String estado;
-
-    @NotNull(message = "La fecha de registro es obligatoria")
-    private LocalDate fechaRegistro;
 }

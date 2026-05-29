@@ -18,7 +18,6 @@ public class EmpresaMandanteMapper {
         empresa.setDireccion(dto.getDireccion());
         empresa.setSector(dto.getSector());
         empresa.setEstado(dto.getEstado());
-        empresa.setFechaRegistro(dto.getFechaRegistro());
 
         return empresa;
     }
@@ -47,6 +46,5 @@ public class EmpresaMandanteMapper {
         empresa.setDireccion(dto.getDireccion());
         empresa.setSector(dto.getSector());
         empresa.setEstado(dto.getEstado());
-        empresa.setFechaRegistro(dto.getFechaRegistro());
     }
 }

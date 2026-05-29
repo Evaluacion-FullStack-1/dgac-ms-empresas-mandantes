@@ -43,6 +43,9 @@ public class EmpresaMandanteService {
 
     public EmpresaMandanteResponseDTO crearEmpresa(EmpresaMandanteRequestDTO dto) {
         EmpresaMandante empresa = empresaMapper.toEntity(dto);
+
+        empresa.setFechaRegistro(java.time.LocalDate.now());
+
         EmpresaMandante empresaGuardada = empresaRepository.save(empresa);
 
         return empresaMapper.toDTO(empresaGuardada);

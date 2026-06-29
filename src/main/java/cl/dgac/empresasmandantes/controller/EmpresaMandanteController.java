@@ -4,6 +4,8 @@ import cl.dgac.empresasmandantes.dto.EmpresaMandanteRequestDTO;
 import cl.dgac.empresasmandantes.dto.EmpresaMandanteResponseDTO;
 import cl.dgac.empresasmandantes.service.EmpresaMandanteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,17 +44,28 @@ public class EmpresaMandanteController {
         return ResponseEntity.ok(empresaService.buscarPorId(id));
     }
 
-    @Operation(summary = "Registrar nueva empresa mandante", description = "Ingresa una nueva entidad corporativa o institucional a la base de datos.")
+    @Operation(
+            summary = "Registrar nueva empresa mandante", 
+            description = "Ingresa una nueva entidad corporativa o institucional a la base de datos.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Datos para registrar un nuevo mandante",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Ejemplo de Registro",
+                                    value = "{\n  \"rut\": \"76.123.456-7\",\n  \"razonSocial\": \"Minera El Cobre SpA\",\n  \"sector\": \"MINERIA\",\n  \"direccion\": \"Av. Libertador 456, Santiago\",\n  \"contacto\": \"Juan Perez\",\n  \"email\": \"contacto@mineraelcobre.cl\",\n  \"estado\": \"ACTIVA\"\n}"
+                            )
+                    )
+            )
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Empresa registrada exitosamente"),
-            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos (ej. RUT duplicado o mal formateado)")
+            @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     })
     @PostMapping
-    public ResponseEntity<EmpresaMandanteResponseDTO> crearEmpresa(
-            @Valid @RequestBody EmpresaMandanteRequestDTO dto) {
-
-        EmpresaMandanteResponseDTO empresaCreada = empresaService.crearEmpresa(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(empresaCreada);
+    public ResponseEntity<EmpresaMandanteResponseDTO> crearEmpresa(@Valid @RequestBody EmpresaMandanteRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(empresaService.crearEmpresa(dto));
     }
 
     @Operation(summary = "Actualizar información corporativa", description = "Modifica los datos comerciales, de contacto o el estado de una empresa mandante existente.")
@@ -62,10 +75,7 @@ public class EmpresaMandanteController {
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EmpresaMandanteResponseDTO> actualizarEmpresa(
-            @PathVariable Long id,
-            @Valid @RequestBody EmpresaMandanteRequestDTO dto) {
-
+    public ResponseEntity<EmpresaMandanteResponseDTO> actualizarEmpresa(@PathVariable Long id, @Valid @RequestBody EmpresaMandanteRequestDTO dto) {
         return ResponseEntity.ok(empresaService.actualizarEmpresa(id, dto));
     }
 
@@ -81,41 +91,30 @@ public class EmpresaMandanteController {
     }
 
     @Operation(summary = "Buscar empresa por RUT", description = "Busca el registro exacto de una empresa utilizando su Rol Único Tributario.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Empresa encontrada"),
-            @ApiResponse(responseCode = "404", description = "RUT no registrado en el sistema")
-    })
+    @ApiResponse(responseCode = "200", description = "Empresa encontrada")
     @GetMapping("/buscar-rut")
-    public ResponseEntity<EmpresaMandanteResponseDTO> buscarPorRut(
-            @RequestParam String rut) {
-
+    public ResponseEntity<EmpresaMandanteResponseDTO> buscarPorRut(@RequestParam String rut) {
         return ResponseEntity.ok(empresaService.buscarPorRut(rut));
     }
 
     @Operation(summary = "Filtrar empresas por estado", description = "Obtiene una lista de empresas según su estado actual (ej. ACTIVA, SUSPENDIDA, INACTIVA).")
     @ApiResponse(responseCode = "200", description = "Búsqueda realizada exitosamente")
     @GetMapping("/estado")
-    public ResponseEntity<List<EmpresaMandanteResponseDTO>> listarPorEstado(
-            @RequestParam String estado) {
-
+    public ResponseEntity<List<EmpresaMandanteResponseDTO>> listarPorEstado(@RequestParam String estado) {
         return ResponseEntity.ok(empresaService.listarPorEstado(estado));
     }
 
     @Operation(summary = "Filtrar por sector comercial", description = "Obtiene una lista de empresas pertenecientes a un sector o rubro específico (ej. MINERIA, AGRICULTURA, AUDIOVISUAL).")
     @ApiResponse(responseCode = "200", description = "Búsqueda realizada exitosamente")
     @GetMapping("/sector")
-    public ResponseEntity<List<EmpresaMandanteResponseDTO>> buscarPorSector(
-            @RequestParam String sector) {
-
+    public ResponseEntity<List<EmpresaMandanteResponseDTO>> buscarPorSector(@RequestParam String sector) {
         return ResponseEntity.ok(empresaService.buscarPorSector(sector));
     }
 
     @Operation(summary = "Buscar por Razón Social", description = "Busca coincidencias parciales o totales en la razón social o nombre comercial de las empresas.")
     @ApiResponse(responseCode = "200", description = "Búsqueda realizada exitosamente")
     @GetMapping("/razon-social")
-    public ResponseEntity<List<EmpresaMandanteResponseDTO>> buscarPorRazonSocial(
-            @RequestParam String razonSocial) {
-
+    public ResponseEntity<List<EmpresaMandanteResponseDTO>> buscarPorRazonSocial(@RequestParam String razonSocial) {
         return ResponseEntity.ok(empresaService.buscarPorRazonSocial(razonSocial));
     }
 

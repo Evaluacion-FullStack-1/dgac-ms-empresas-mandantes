@@ -17,14 +17,16 @@ public class EmpresaMandanteService {
 
     private final EmpresaMandanteRepository empresaRepository;
     private final EmpresaMandanteMapper empresaMapper;
-    private final WebClient.Builder webClientBuilder;
+    
+    // Inyectamos el WebClient pre-configurado en WebClientConfig
+    private final WebClient webClientEmpresasProveedoras;
 
     public EmpresaMandanteService(EmpresaMandanteRepository empresaRepository,
                                   EmpresaMandanteMapper empresaMapper,
-                                  WebClient.Builder webClientBuilder) {
+                                  WebClient webClientEmpresasProveedoras) {
         this.empresaRepository = empresaRepository;
         this.empresaMapper = empresaMapper;
-        this.webClientBuilder = webClientBuilder;
+        this.webClientEmpresasProveedoras = webClientEmpresasProveedoras;
     }
 
     public List<EmpresaMandanteResponseDTO> listarEmpresas() {
@@ -97,9 +99,10 @@ public class EmpresaMandanteService {
     }
 
     public String consultarMicroservicioEmpresasProveedoras() {
-        return webClientBuilder.build()
+        // Usamos la ruta relativa y el WebClient inyectado
+        return webClientEmpresasProveedoras
                 .get()
-                .uri("http://localhost:8085/api/empresas-proveedoras")
+                .uri("/api/empresas-proveedoras")
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();

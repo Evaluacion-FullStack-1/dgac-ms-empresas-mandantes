@@ -118,7 +118,7 @@ public class EmpresaMandanteController {
         return ResponseEntity.ok(empresaService.buscarPorRazonSocial(razonSocial));
     }
 
-    @Operation(summary = "Consultar estado de Empresas Proveedoras (WebClient)", description = "Endpoint de integración para verificar la disponibilidad del microservicio de Empresas Proveedoras.")
+    @Operation(summary = "Consultar estado de Empresas Proveedoras", description = "Endpoint de integración que verifica la disponibilidad del microservicio de Empresas Proveedoras.")
     @ApiResponse(responseCode = "200", description = "Comunicación exitosa con el microservicio de Empresas Proveedoras")
     @GetMapping("/empresas-proveedoras")
     public ResponseEntity<String> consultarEmpresasProveedoras() {

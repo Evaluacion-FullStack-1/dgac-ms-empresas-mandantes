@@ -6,8 +6,9 @@ import cl.dgac.empresasmandantes.exception.ResourceNotFoundException;
 import cl.dgac.empresasmandantes.mapper.EmpresaMandanteMapper;
 import cl.dgac.empresasmandantes.model.EmpresaMandante;
 import cl.dgac.empresasmandantes.repository.EmpresaMandanteRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,15 +19,19 @@ public class EmpresaMandanteService {
     private final EmpresaMandanteRepository empresaRepository;
     private final EmpresaMandanteMapper empresaMapper;
     
-    // Inyectamos el WebClient pre-configurado en WebClientConfig
-    private final WebClient webClientEmpresasProveedoras;
+    // Inyectamos RestTemplate en lugar de WebClient
+    private final RestTemplate restTemplate;
+
+    // Leemos la URL base desde el application.yml
+    @Value("${empresas-proveedoras.base-url}")
+    private String empresasProveedorasBaseUrl;
 
     public EmpresaMandanteService(EmpresaMandanteRepository empresaRepository,
                                   EmpresaMandanteMapper empresaMapper,
-                                  WebClient webClientEmpresasProveedoras) {
+                                  RestTemplate restTemplate) {
         this.empresaRepository = empresaRepository;
         this.empresaMapper = empresaMapper;
-        this.webClientEmpresasProveedoras = webClientEmpresasProveedoras;
+        this.restTemplate = restTemplate;
     }
 
     public List<EmpresaMandanteResponseDTO> listarEmpresas() {
@@ -45,9 +50,7 @@ public class EmpresaMandanteService {
 
     public EmpresaMandanteResponseDTO crearEmpresa(EmpresaMandanteRequestDTO dto) {
         EmpresaMandante empresa = empresaMapper.toEntity(dto);
-
         empresa.setFechaRegistro(java.time.LocalDate.now());
-
         EmpresaMandante empresaGuardada = empresaRepository.save(empresa);
 
         return empresaMapper.toDTO(empresaGuardada);
@@ -98,13 +101,12 @@ public class EmpresaMandanteService {
                 .collect(Collectors.toList());
     }
 
+    // --- MÉTODO CORREGIDO ---
     public String consultarMicroservicioEmpresasProveedoras() {
-        // Usamos la ruta relativa y el WebClient inyectado
-        return webClientEmpresasProveedoras
-                .get()
-                .uri("/api/empresas-proveedoras")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        // Construimos la URL completa para llamar al otro servicio vía Eureka
+        String urlFinal = empresasProveedorasBaseUrl + "/api/empresas-proveedoras";
+        
+        // Hacemos la petición GET de forma síncrona
+        return restTemplate.getForObject(urlFinal, String.class);
     }
-} 
+}
